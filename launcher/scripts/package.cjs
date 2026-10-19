@@ -89,7 +89,7 @@ function verifySignedMacArchive() {
   try {
     runChecked("ditto", ["-x", "-k", path.join(staging, archives[0]), verificationRoot]);
     const appBundle = path.join(verificationRoot, `${launcherManifest.build.productName}.app`);
-    runChecked("codesign", ["--verify", "--deep", "--strict", appBundle]);
+    runChecked("codesign", ["--verify", "--deep", "--strict", "--verbose=4", appBundle]);
     validateRuntimeBundle(path.join(appBundle, "Contents", "Resources", "runtime"), {
       version: launcherManifest.version,
       platform: "darwin",
