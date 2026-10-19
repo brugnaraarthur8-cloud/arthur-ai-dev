@@ -1,0 +1,27 @@
+name: Arthur AI Dev - Python tests
+
+on:
+  push:
+    paths:
+      - 'arthur/**'
+      - '.github/workflows/arthur-python-tests.yml'
+  pull_request:
+    paths:
+      - 'arthur/**'
+      - '.github/workflows/arthur-python-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compilar exemplos
+        run: python -m compileall -q arthur
+      - name: Rodar testes
+        run: python -m unittest discover -s arthur/portfolio/monitor_inbox/tests -v

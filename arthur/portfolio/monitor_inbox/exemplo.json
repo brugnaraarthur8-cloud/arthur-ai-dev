@@ -1,0 +1,20 @@
+[
+  {
+    "protocolo": "DEMO-0001",
+    "data_solicitacao": "2026-10-17",
+    "nome": "Pessoa Exemplo A",
+    "empresa": "Empresa Fictícia Azul",
+    "servico": "Cancelamento simulado",
+    "status": "pendente",
+    "observacao": "Registro apenas de demonstração"
+  },
+  {
+    "protocolo": "DEMO-0002",
+    "data_solicitacao": "2026-10-18",
+    "nome": "Pessoa Exemplo B",
+    "empresa": "Empresa Fictícia Verde",
+    "servico": "Consulta simulada",
+    "status": "concluído",
+    "observacao": "Nenhum dado real"
+  }
+]
