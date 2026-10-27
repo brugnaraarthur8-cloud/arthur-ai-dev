@@ -4,6 +4,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { validateRuntimeBundle } = require("../electron/runtime-install.cjs");
 const { requireLibnotifySymbol } = require("./prepare-linux-appimage-tools.cjs");
+const { verifyMacArchiveSignature } = require("./mac-signature.cjs");
 
 const root = path.resolve(__dirname, "..");
 const launcherManifest = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
@@ -89,16 +90,7 @@ function verifySignedMacArchive() {
   try {
     runChecked("ditto", ["-x", "-k", path.join(staging, archives[0]), verificationRoot]);
     const appBundle = path.join(verificationRoot, `${launcherManifest.build.productName}.app`);
-    // An unsigned PR/local build has no signing identity; codesign cannot validate
-    // a signature that was deliberately never created. Keep runtime validation below.
-    const hasSigningIdentity = Boolean(env.CSC_LINK || env.CSC_NAME);
-    const builderSkipsPrSigning = env.GITHUB_EVENT_NAME === "pull_request"
-      && env.CSC_FOR_PULL_REQUEST !== "true";
-    if (hasSigningIdentity && !builderSkipsPrSigning) {
-      runChecked("codesign", ["--verify", "--deep", "--strict", "--verbose=4", appBundle]);
-    } else {
-      console.log("macOS package is unsigned: skipping signature verification; validating embedded runtime integrity.");
-    }
+    verifyMacArchiveSignature(appBundle, { env, runChecked });
     validateRuntimeBundle(path.join(appBundle, "Contents", "Resources", "runtime"), {
       version: launcherManifest.version,
       platform: "darwin",

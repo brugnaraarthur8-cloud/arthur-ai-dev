@@ -10,23 +10,38 @@ import argparse
 import csv
 import json
 import os
+import re
 import tempfile
 from datetime import date
 from pathlib import Path
 from typing import Any
 
 COLUNAS = ("protocolo", "data_solicitacao", "nome", "empresa", "servico", "status", "observacao")
+DATA_ISO = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+PREFIXOS_FORMULA = ("=", "+", "-", "@", "＝", "＋", "－", "＠")
 
 
 def validar(evento: Any) -> dict[str, str]:
     if not isinstance(evento, dict):
         raise ValueError("Cada solicitação deve ser um objeto JSON")
-    linha = {campo: str(evento.get(campo, "")).strip() for campo in COLUNAS}
+    linha = {}
+    for campo in COLUNAS:
+        valor = evento.get(campo, "")
+        if not isinstance(valor, str):
+            raise ValueError(f"{campo} deve ser texto; null, números e estruturas não são aceitos")
+        if any(ord(caractere) < 32 or ord(caractere) == 127 for caractere in valor):
+            raise ValueError(f"{campo} contém caracteres de controle; use texto em uma única linha")
+        valor = valor.strip()
+        if valor.startswith(PREFIXOS_FORMULA):
+            raise ValueError(f"{campo} começa com um prefixo de fórmula de planilha não permitido")
+        linha[campo] = valor
     obrigatorios = ("protocolo", "data_solicitacao", "nome", "servico")
     vazios = [campo for campo in obrigatorios if not linha[campo]]
     if vazios:
         raise ValueError("Campos obrigatórios ausentes: " + ", ".join(vazios))
     try:
+        if not DATA_ISO.fullmatch(linha["data_solicitacao"]):
+            raise ValueError("Formato de data inválido")
         date.fromisoformat(linha["data_solicitacao"])
     except ValueError as exc:
         raise ValueError("data_solicitacao deve estar em YYYY-MM-DD") from exc
@@ -45,14 +60,32 @@ def carregar_existentes(caminho: Path) -> list[dict[str, str]]:
     if not caminho.exists():
         return []
     with caminho.open("r", newline="", encoding="utf-8-sig") as arquivo:
-        leitor = csv.DictReader(arquivo)
-        if leitor.fieldnames != list(COLUNAS):
-            raise ValueError("CSV existente não tem as colunas esperadas; nenhuma alteração foi feita")
-        return [{campo: linha[campo] for campo in COLUNAS} for linha in leitor]
+        leitor = csv.DictReader(arquivo, strict=True)
+        linhas = []
+        protocolos = set()
+        try:
+            if leitor.fieldnames != list(COLUNAS):
+                raise ValueError("CSV existente não tem as colunas esperadas; nenhuma alteração foi feita")
+            for linha in leitor:
+                if None in linha or any(valor is None for valor in linha.values()):
+                    raise ValueError(f"CSV existente: quantidade incorreta de campos na linha {leitor.line_num}")
+                try:
+                    validada = validar(linha)
+                except ValueError as exc:
+                    raise ValueError(f"CSV existente inválido na linha {leitor.line_num}: {exc}") from exc
+                chave = validada["protocolo"].casefold()
+                if chave in protocolos:
+                    raise ValueError(f"CSV existente: protocolo duplicado na linha {leitor.line_num}")
+                protocolos.add(chave)
+                # Valida sem normalizar ou descartar os valores já gravados.
+                linhas.append(linha)
+        except csv.Error as exc:
+            raise ValueError(f"CSV existente malformado na linha {leitor.line_num}") from exc
+        return linhas
 
 
 def mesclar(existentes: list[dict[str, str]], novos: list[dict[str, str]]) -> tuple[list[dict[str, str]], int]:
-    protocolos = {linha["protocolo"].casefold() for linha in existentes}
+    protocolos = {linha["protocolo"].strip().casefold() for linha in existentes}
     resultado = list(existentes)
     adicionados = 0
     for linha in novos:

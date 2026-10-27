@@ -11,6 +11,7 @@ Personalização independente do fork [miuuyy/codex-chatgpt-web](https://github.
 - `arthur/cli.py`: exibe perfis e configurações.
 - `arthur/portfolio/monitor_inbox/`: exemplo local e funcional de JSON para CSV.
 - `.github/workflows/arthur-python-tests.yml`: verificações Python automáticas.
+- Testes Python executados no CI em Ubuntu, Windows e macOS 15.
 - `docs/ARTHUR-INSTALACAO.md`: instruções Windows e próximos passos.
 
 ## Comece pelos exemplos (Python 3.11+)
@@ -27,6 +28,12 @@ python -m unittest discover -s arthur/portfolio/monitor_inbox/tests -v
 Os arquivos gerados localmente ficam em `saida/`, ignorada no Git. O exemplo funciona sem pacotes adicionais, login, API, rede nem dados de clientes.
 
 ## Sobre o launcher
+
+O empacotamento macOS verifica assinaturas configuradas e ad hoc. A única exceção é o build de `pull_request` sem `CSC_FOR_PULL_REQUEST=true`, pois o electron-builder pula a assinatura nessa situação. O log informa que a assinatura não foi verificada; a integridade do runtime continua sendo validada. Essa exceção não se aplica a pushes na main, tags ou builds locais.
+
+Teste da política: `node --test launcher/tests/mac-signature.test.cjs`. A verificação real de assinaturas exige macOS; o smoke test do PR não equivale à validação de uma release assinada.
+
+Para desfazer as correções, use `git revert <commit-das-correcoes>` em uma branch de trabalho e revise o diff antes de publicar. Isso também reverte as proteções adicionadas.
 
 Consulte o [README original](README.md) para instalação e uso do launcher (base TypeScript + Bun 1.4.0 para desenvolver a partir do código). A ponte usa automação não oficial do navegador e pode parar de funcionar após atualizações do ChatGPT. Não utilize essa técnica como integração de produção em serviços de clientes. Para automações comerciais, use APIs oficiais e autorização explícita.
 

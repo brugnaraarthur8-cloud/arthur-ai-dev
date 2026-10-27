@@ -1,4 +1,4 @@
-# Arthur AI Dev (acrescentar ao .gitignore do upstream)
+# Arthur AI Dev (referência; estas regras já estão no .gitignore)
 saida/
 .venv/
 __pycache__/

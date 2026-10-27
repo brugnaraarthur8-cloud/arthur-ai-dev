@@ -33,7 +33,7 @@ Os comandos acima não exigem login, chaves nem acesso à internet. Não use dad
 
 ## 3. Git e arquivos gerados
 
-O arquivo `saida/solicitacoes.csv` é gerado localmente. Coloque `saida/` no `.gitignore` ao desenvolver. Nunca publique arquivos de sessão do ChatGPT ou chaves da API.
+O arquivo `saida/solicitacoes.csv` é gerado localmente. O `.gitignore` já cobre `saida/`, `.venv/`, caches Python, `.env.arthur` e `arthur-secrets/`. Isso não remove arquivos já rastreados nem substitui a revisão do diff. Nunca publique arquivos de sessão do ChatGPT ou chaves da API.
 
 ## 4. Launcher do upstream
 
