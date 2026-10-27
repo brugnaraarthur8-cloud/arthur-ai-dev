@@ -5,10 +5,16 @@ on:
     paths:
       - 'arthur/**'
       - '.github/workflows/arthur-python-tests.yml'
+      - 'launcher/scripts/mac-signature.cjs'
+      - 'launcher/scripts/package.cjs'
+      - 'launcher/tests/mac-signature.test.cjs'
   pull_request:
     paths:
       - 'arthur/**'
       - '.github/workflows/arthur-python-tests.yml'
+      - 'launcher/scripts/mac-signature.cjs'
+      - 'launcher/scripts/package.cjs'
+      - 'launcher/tests/mac-signature.test.cjs'
 
 permissions:
   contents: read
@@ -29,3 +35,5 @@ jobs:
         run: python -m compileall -q arthur
       - name: Rodar testes
         run: python -m unittest discover -s arthur/portfolio/monitor_inbox/tests -v
+      - name: Testar política de assinatura macOS
+        run: node --test launcher/tests/mac-signature.test.cjs
