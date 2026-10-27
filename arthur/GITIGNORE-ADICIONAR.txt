@@ -1,0 +1,8 @@
+# Arthur AI Dev (referência; estas regras já estão no .gitignore)
+saida/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env.arthur
+arthur-secrets/

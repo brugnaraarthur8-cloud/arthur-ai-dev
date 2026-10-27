@@ -1,0 +1,15 @@
+{
+  "nome": "Arthur AI Dev",
+  "idioma": "pt-BR",
+  "foco": [
+    "Python",
+    "TypeScript",
+    "Automações empresariais",
+    "Agentes de IA"
+  ],
+  "politica": {
+    "dados": "Exclusivamente sintéticos no portfólio",
+    "permissoes": "Aprovação explícita antes de publicar/executar ações externas",
+    "integracao_comercial": "Preferir API oficial"
+  }
+}

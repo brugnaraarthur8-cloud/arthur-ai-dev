@@ -18,3 +18,12 @@ launcher/artifacts/
 output/
 notes.md
 /.agents/skills/github-pairing/
+
+# Arthur AI Dev: saídas locais, ambiente Python e segredos
+saida/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env.arthur
+arthur-secrets/
